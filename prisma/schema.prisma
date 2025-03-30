@@ -1,5 +1,3 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,9 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Task {
-  id        Int      @id @default(autoincrement()) // identifiant unique
-  content   String                                 // texte de la tâche
-  done      Boolean  @default(false)               // tâche cochée ou non
-  createdAt DateTime @default(now())               // date de création
+model User {
+  id       Int       @id @default(autoincrement())
+  name     String
+  email    String     @unique
+  password String     // ⚠️ à hasher côté code, bien sûr
+  lists    UserList[] // 1:N avec UserList
+}
+
+model UserList {
+  id     Int       @id @default(autoincrement())
+  name   String
+  userId Int
+  user   User      @relation(fields: [userId], references: [id])
+  tasks  TaskList[] // 1:N avec TaskList
+}
+
+model TaskList {
+  id      Int      @id @default(autoincrement())
+  content String
+  listId  Int
+  list    UserList @relation(fields: [listId], references: [id])
+  done    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
